@@ -31,6 +31,59 @@ class ApplicationTest extends NsTest {
         );
     }
 
+    @Test
+    void 기능_테스트_공동_우승() {
+        assertRandomNumberInRangeTest(
+                () -> {
+                    run("pobi,woni,jun", "2");
+                    assertThat(output()).contains(
+                            "pobi : -", "woni : -", "jun : ",
+                            "pobi : --", "woni : --", "jun : -",
+                            "최종 우승자 : pobi, woni"
+                    );
+                },
+                MOVING_FORWARD, MOVING_FORWARD, STOP,
+                MOVING_FORWARD, MOVING_FORWARD, MOVING_FORWARD
+        );
+    }
+
+    @Test
+    void 예외_테스트_이름_길이_초과() {
+        assertSimpleTest(() ->
+                assertThatThrownBy(() -> runException("pobi,pobiwoni", "1"))
+                        .isInstanceOf(IllegalArgumentException.class)
+                        .hasMessageContaining("자동차 이름은 5자를 초과할 수 없습니다.")
+        );
+    }
+
+    @Test
+    void 예외_테스트_이름_중복() {
+        assertSimpleTest(() ->
+                assertThatThrownBy(() -> runException("pobi,woni,pobi", "1"))
+                        .isInstanceOf(IllegalArgumentException.class)
+                        .hasMessageContaining("중복된 자동차 이름를 등록할 수 없습니다.")
+        );
+    }
+
+    @Test
+    void 예외_테스트_시도_횟수_타입() {
+        assertSimpleTest(() ->
+                assertThatThrownBy(() -> runException("pobi,woni", "a"))
+                        .isInstanceOf(IllegalArgumentException.class)
+                        .hasMessageContaining("시도 횟수는 숫자여야 합니다.")
+        );
+    }
+
+    @Test
+    void 예외_테스트_시도_횟수_범위() {
+        assertSimpleTest(() ->
+                assertThatThrownBy(() -> runException("pobi,woni", "-10"))
+                        .isInstanceOf(IllegalArgumentException.class)
+                        .hasMessageContaining("시도 횟수는 양의 정수여야 합니다.")
+        );
+    }
+
+
     @Override
     public void runMain() {
         Application.main(new String[]{});
